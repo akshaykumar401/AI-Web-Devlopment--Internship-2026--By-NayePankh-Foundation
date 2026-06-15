@@ -1,0 +1,190 @@
+import { useRef, useEffect, useState } from 'react'
+
+/* ── Small icon components ───────────────────────────── */
+const SearchIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/>
+  </svg>
+)
+const ChartIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <line x1="18" y1="20" x2="18" y2="10"/>
+    <line x1="12" y1="20" x2="12" y2="4"/>
+    <line x1="6"  y1="20" x2="6"  y2="14"/>
+    <line x1="2"  y1="20" x2="22" y2="20"/>
+  </svg>
+)
+const ChatIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+)
+const ClockIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+  </svg>
+)
+
+/* ── Match demo widget ───────────────────────────────── */
+const MatchDemo = () => (
+  <div className="mt-4">
+    <div className="flex items-center gap-2 mb-3">
+      <div className="w-11 h-6 rounded-full flex items-center justify-end pr-1"
+           style={{ background: '#E85D04' }}>
+        <div className="w-4 h-4 bg-white rounded-full" />
+      </div>
+      <div className="w-11 h-6 bg-gray-200 rounded-full flex items-center pl-1">
+        <div className="w-4 h-4 bg-white rounded-full" />
+      </div>
+      <span className="text-xs text-gray-400">1 / 124</span>
+    </div>
+    {['Match Score: 94%', 'Location: Bihar', 'Skills: Teaching'].map(t => (
+      <div key={t} className="flex items-center gap-2 bg-orange-50 rounded-lg px-3 py-2 mb-1.5 text-xs text-gray-700">
+        <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
+        {t}
+      </div>
+    ))}
+  </div>
+)
+
+/* ── Bar chart widget ────────────────────────────────── */
+const BarChart = () => (
+  <div className="flex items-end gap-2 h-20 mt-4">
+    {[40, 65, 45, 80, 55, 90, 70].map((h, i) => (
+      <div key={i} className={`flex-1 rounded-t-sm`}
+           style={{
+             height: `${h}%`,
+             background: i === 5 ? '#E85D04' : i === 6 ? 'rgba(232,93,4,0.4)' : 'rgba(255,255,255,0.12)',
+           }} />
+    ))}
+  </div>
+)
+
+const AITools = () => {
+  const ref = useRef()
+  const [vis, setVis] = useState(false)
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setVis(true) },
+      { threshold: 0.08 }
+    )
+    if (ref.current) obs.observe(ref.current)
+    return () => obs.disconnect()
+  }, [])
+
+  const fadeCard = (delay = 0) =>
+    `transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`
+
+  return (
+    <section ref={ref} id="AITool" className="py-20 sm:py-28 bg-gray-50 px-4 sm:px-6">
+      <div className="max-w-6xl mx-auto">
+
+        {/* Header row */}
+        <div className={`flex flex-col sm:flex-row sm:justify-between sm:items-center
+                         gap-4 mb-14 ${fadeCard()}`}>
+          <div>
+            <div className="badge mb-4">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" strokeWidth="2.5">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+              AI For Good
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 tracking-tight">
+              Technology for Social Change
+            </h2>
+            <p className="text-sm text-gray-500 mt-3 max-w-sm leading-relaxed">
+              Harnessing transparency and efficiency for real social impact.
+            </p>
+          </div>
+
+          {/* Live badge */}
+          <div className="flex items-center gap-2 px-5 py-2.5 rounded-full text-white text-xs font-bold shrink-0"
+               style={{ background: '#1A1A2E' }}>
+            <span className="w-2 h-2 rounded-full bg-emerald-400 anim-pulse-dot" />
+            100% On-Chain Tracking
+          </div>
+        </div>
+
+        {/* Bento grid — stacks on mobile, 2-col on lg */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+          {/* Left column */}
+          <div className="flex flex-col gap-5">
+            {/* Smart Matching */}
+            <div className={`rounded-2xl p-6 sm:p-7 border ${fadeCard()} delay-100`}
+                 style={{ background: '#FFF8F5', borderColor: 'rgba(232,93,4,0.18)' }}>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-xl bg-orange-100 text-orange-500
+                                flex items-center justify-center shrink-0">
+                  <SearchIcon />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">Smart Matching</h3>
+              </div>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Connects volunteers and social resources with specific district needs in
+                real-time, ensuring peak impact and minimum risk.
+              </p>
+              <MatchDemo />
+            </div>
+
+            {/* 24/7 Support */}
+            <div className={`bg-white rounded-2xl p-6 sm:p-7 border border-gray-100 ${fadeCard()} delay-300`}>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-xl bg-gray-100 text-gray-600
+                                flex items-center justify-center shrink-0">
+                  <ChatIcon />
+                </div>
+                <h3 className="text-base font-bold text-gray-900">24/7 Smart Support</h3>
+              </div>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Localized AI response systems providing answers to volunteers and supporters
+                in 22 regional languages.
+              </p>
+            </div>
+          </div>
+
+          {/* Right column */}
+          <div className="flex flex-col gap-5">
+            {/* Impact Analytics (dark) */}
+            <div className={`rounded-2xl p-6 sm:p-7 ${fadeCard()} delay-200`}
+                 style={{ background: '#1A1A2E' }}>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-orange-500"
+                     style={{ background: 'rgba(232,93,4,0.2)' }}>
+                  <ChartIcon />
+                </div>
+                <h3 className="text-lg font-bold text-white">Impact Analytics</h3>
+              </div>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                Real-time data visualization of social progress across 48+ government districts.
+              </p>
+              <BarChart />
+            </div>
+
+            {/* Predictive Modeling */}
+            <div className={`bg-white rounded-2xl p-6 sm:p-7 border border-gray-100
+                             flex items-start gap-4 ${fadeCard()} delay-400`}>
+              <div className="w-12 h-12 rounded-xl bg-gray-100 text-gray-600
+                              flex items-center justify-center shrink-0">
+                <ClockIcon />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-gray-900 mb-1">Predictive Modeling</h3>
+                <span className="inline-block text-xs font-bold text-emerald-500 tracking-wide mb-2">
+                  COMING SOON
+                </span>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  Predicting social crises before they happen using big data and machine learning.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default AITools
