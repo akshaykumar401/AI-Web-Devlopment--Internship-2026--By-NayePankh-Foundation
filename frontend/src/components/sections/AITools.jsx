@@ -1,29 +1,10 @@
 import { useRef, useEffect, useState } from 'react'
 
-/* ── Small icon components ───────────────────────────── */
-const SearchIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/>
-  </svg>
-)
-const ChartIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <line x1="18" y1="20" x2="18" y2="10"/>
-    <line x1="12" y1="20" x2="12" y2="4"/>
-    <line x1="6"  y1="20" x2="6"  y2="14"/>
-    <line x1="2"  y1="20" x2="22" y2="20"/>
-  </svg>
-)
-const ChatIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-  </svg>
-)
-const ClockIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-  </svg>
-)
+/* ── Small icon components (Remix Icons) ─────────────── */
+const SearchIcon = () => <i className="ri-search-2-line text-xl" />
+const ChartIcon  = () => <i className="ri-bar-chart-2-line text-xl" />
+const ChatIcon   = () => <i className="ri-message-2-line text-xl" />
+const ClockIcon  = () => <i className="ri-time-line text-xl" />
 
 /* ── Match demo widget ───────────────────────────────── */
 const MatchDemo = () => (
@@ -85,10 +66,7 @@ const AITools = () => {
                          gap-4 mb-14 ${fadeCard()}`}>
           <div>
             <div className="badge mb-4">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-                   stroke="currentColor" strokeWidth="2.5">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-              </svg>
+              <i className="ri-flashlight-line text-sm" />
               AI For Good
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 tracking-tight">

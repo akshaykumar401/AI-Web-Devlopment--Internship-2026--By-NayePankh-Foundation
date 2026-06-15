@@ -6,6 +6,22 @@ const CHAT = [
   { from: 'ai', text: "Namaste! I am Panah-AI. How can I help you? I'm here to support you today!" },
   { from: 'user', text: "I want to know how I can volunteer." },
   { from: 'ai', text: "That's great! You can register as a changemaker right here on the page, or learn about specific projects near you." },
+  { from: 'user', text: "I want to know how I can volunteer." },
+  { from: 'ai', text: "That's great! You can register as a changemaker right here on the page, or learn about specific projects near you." },
+  { from: 'user', text: "I want to know how I can volunteer." },
+  { from: 'ai', text: "That's great! You can register as a changemaker right here on the page, or learn about specific projects near you." },
+  { from: 'user', text: "I want to know how I can volunteer." },
+  { from: 'ai', text: "That's great! You can register as a changemaker right here on the page, or learn about specific projects near you." },
+  { from: 'user', text: "I want to know how I can volunteer." },
+  { from: 'ai', text: "That's great! You can register as a changemaker right here on the page, or learn about specific projects near you." },
+  { from: 'user', text: "I want to know how I can volunteer." },
+  { from: 'ai', text: "That's great! You can register as a changemaker right here on the page, or learn about specific projects near you." },
+  { from: 'user', text: "I want to know how I can volunteer." },
+  { from: 'ai', text: "That's great! You can register as a changemaker right here on the page, or learn about specific projects near you." },
+  { from: 'user', text: "I want to know how I can volunteer." },
+  { from: 'ai', text: "That's great! You can register as a changemaker right here on the page, or learn about specific projects near you." },
+  { from: 'user', text: "I want to know how I can volunteer." },
+  { from: 'ai', text: "That's great! You can register as a changemaker right here on the page, or learn about specific projects near you." },
 ]
 
 const Join = () => {
@@ -45,9 +61,7 @@ const Join = () => {
             <div className="relative shrink-0">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center"
                 style={{ background: 'linear-gradient(135deg,#E85D04,#F48C06)' }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
-                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-                </svg>
+                <i className="ri-flashlight-fill text-white text-base leading-none" />
               </div>
               <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-gray-900" />
             </div>
@@ -67,9 +81,7 @@ const Join = () => {
                 {m.from === 'ai' && (
                   <div className="w-7 h-7 rounded-lg shrink-0 mt-0.5 flex items-center justify-center"
                     style={{ background: 'linear-gradient(135deg,#E85D04,#F48C06)' }}>
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="white">
-                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-                    </svg>
+                    <i className="ri-flashlight-fill text-white" style={{ fontSize: '11px' }} />
                   </div>
                 )}
                 <div className={`max-w-[75%] px-4 py-2.5 text-sm leading-relaxed rounded-2xl shadow-sm
@@ -98,11 +110,7 @@ const Join = () => {
                          text-white transition-all hover:-translate-y-0.5"
               style={{ background: 'linear-gradient(135deg,#E85D04,#F48C06)' }}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" strokeWidth="2.5">
-                <line x1="22" y1="2" x2="11" y2="13" />
-                <polygon points="22 2 15 22 11 13 2 9 22 2" />
-              </svg>
+              <i className="ri-send-plane-fill text-sm" />
             </button>
           </div>
         </div>
@@ -112,13 +120,7 @@ const Join = () => {
           ${vis ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}>
 
           <div className="badge mb-5">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" strokeWidth="2.5">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg>
+            <i className="ri-group-line text-sm" />
             Join the Movement
           </div>
 
@@ -134,10 +136,7 @@ const Join = () => {
             <div className="bg-emerald-50 rounded-2xl p-8 text-center border border-emerald-100">
               <div className="w-14 h-14 bg-emerald-500 rounded-full flex items-center
                               justify-center mx-auto mb-4">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
-                  stroke="white" strokeWidth="2.5">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
+                <i className="ri-check-line text-white text-2xl" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Welcome aboard! 🎉</h3>
               <p className="text-sm text-gray-500">
@@ -183,11 +182,7 @@ const Join = () => {
 
               <button type="submit" className="btn-primary w-full justify-center !py-4 !text-sm">
                 Send Application
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" strokeWidth="2.5">
-                  <line x1="22" y1="2" x2="11" y2="13" />
-                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                </svg>
+                <i className="ri-send-plane-fill text-sm" />
               </button>
 
               <p className="text-xs text-gray-400 text-center">
