@@ -5,10 +5,40 @@ const AREAS = ['Digital Literacy', 'Healthcare', 'Skill Development', 'Rural Edu
 const VolunteerForm = () => {
   const [form, setForm] = useState({ name: '', email: '', area: AREAS[0] })
   const [done, setDone] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (form.name && form.email) setDone(true)
+    if (!form.name || !form.email) return
+
+    setLoading(true)
+    setError('')
+
+    try {
+      const res = await fetch('http://127.0.0.1:8000/become-volunteer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          full_name: form.name,
+          email: form.email,
+          area_of_interest: form.area,
+        }),
+      })
+
+      const data = await res.json()
+      if (res.ok) {
+        setDone(true)
+      } else {
+        setError(data.message || 'Something went wrong. Please try again.')
+      }
+    } catch (err) {
+      setError('Could not connect to the server. Please ensure the backend is running.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const inputCls = `w-full px-4 py-3 border border-gray-200 rounded-xl text-sm text-gray-900 bg-gray-50 outline-none transition-all focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-100`
@@ -75,9 +105,15 @@ const VolunteerForm = () => {
             </select>
           </div>
 
-          <button type="submit" className="btn-primary w-full justify-center !py-4 !text-sm cursor-pointer">
-            Send Application
-            <i className="ri-send-plane-fill text-sm" />
+          {error && (
+            <div className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-xl px-4 py-2.5">
+              {error}
+            </div>
+          )}
+
+          <button type="submit" disabled={loading} className="btn-primary w-full justify-center !py-4 !text-sm cursor-pointer disabled:opacity-50">
+            {loading ? 'Submitting...' : 'Send Application'}
+            {!loading && <i className="ri-send-plane-fill text-sm" />}
           </button>
 
           <p className="text-xs text-gray-400 text-center">
