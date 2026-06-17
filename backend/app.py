@@ -1,5 +1,6 @@
 import os
 import sqlite3
+from google import genai
 from flask import Flask, request, jsonify, render_template, session, redirect
 
 app = Flask(__name__)
@@ -19,6 +20,7 @@ def load_env():
 # Load environment variables
 load_env()
 PORT = os.environ.get('PORT', 8000)
+
 
 # Parse admin users array
 admin_users_str = os.environ.get('ADMIN_USERS', 'admin:admin')
@@ -213,18 +215,110 @@ def donate():
     }
   }), 200
 
+# Predefined answers for common questions to save API latency and token cost
+PREDEFINED_ANSWERS = {
+  'volunteer': "We'd love to have you join NayePankh Foundation! You can sign up right now by filling out the 'Become a Changemaker' form next to this chat. Select an area of interest (Digital Literacy, Rural Education, etc.) and submit. Our team will contact you within 24-48 hours! 🙋‍♂️",
+  'join': "We'd love to have you join NayePankh Foundation! You can sign up right now by filling out the 'Become a Changemaker' form next to this chat. Select an area of interest (Digital Literacy, Rural Education, etc.) and submit. Our team will contact you within 24-48 hours! 🙋‍♂️",
+  'changemaker': "We'd love to have you join NayePankh Foundation! You can sign up right now by filling out the 'Become a Changemaker' form next to this chat. Select an area of interest (Digital Literacy, Rural Education, etc.) and submit. Our team will contact you within 24-48 hours! 🙋‍♂️",
+  
+  'project': "Our active initiatives include:\n• 📚 **Rural Education**: Providing resources and schooling support to children in rural areas.\n• 💻 **Digital Literacy**: Building computer training labs to prepare youth for the digital world.\n• 🛠️ **Skill Development**: Job-oriented training programs for young adults.\n• 🏥 **Healthcare & Environment**: Direct social welfare, hygiene camps, and tree planting. 🌟",
+  'program': "Our active initiatives include:\n• 📚 **Rural Education**: Providing resources and schooling support to children in rural areas.\n• 💻 **Digital Literacy**: Building computer training labs to prepare youth for the digital world.\n• 🛠️ **Skill Development**: Job-oriented training programs for young adults.\n• 🏥 **Healthcare & Environment**: Direct social welfare, hygiene camps, and tree planting. 🌟",
+  'campaign': "Our active initiatives include:\n• 📚 **Rural Education**: Providing resources and schooling support to children in rural areas.\n• 💻 **Digital Literacy**: Building computer training labs to prepare youth for the digital world.\n• 🛠️ **Skill Development**: Job-oriented training programs for young adults.\n• 🏥 **Healthcare & Environment**: Direct social welfare, hygiene camps, and tree planting. 🌟",
+  'work': "Our active initiatives include:\n• 📚 **Rural Education**: Providing resources and schooling support to children in rural areas.\n• 💻 **Digital Literacy**: Building computer training labs to prepare youth for the digital world.\n• 🛠️ **Skill Development**: Job-oriented training programs for young adults.\n• 🏥 **Healthcare & Environment**: Direct social welfare, hygiene camps, and tree planting. 🌟",
+
+  'donate': "Thank you for supporting NayePankh Foundation! You can make a secure contribution by clicking the 'Donate' button in the navigation header. Your donation directly funds learning materials, computer equipment, and school renovations. 🤝",
+  'money': "Thank you for supporting NayePankh Foundation! You can make a secure contribution by clicking the 'Donate' button in the navigation header. Your donation directly funds learning materials, computer equipment, and school renovations. 🤝",
+  'support': "Thank you for supporting NayePankh Foundation! You can make a secure contribution by clicking the 'Donate' button in the navigation header. Your donation directly funds learning materials, computer equipment, and school renovations. 🤝",
+  'contribution': "Thank you for supporting NayePankh Foundation! You can make a secure contribution by clicking the 'Donate' button in the navigation header. Your donation directly funds learning materials, computer equipment, and school renovations. 🤝",
+
+  'contact': "You can reach NayePankh Foundation via:\n• 📧 **Email**: support@nayepankh.org\n• 📞 **Phone**: +91-XXXXXXXXXX\n• 📍 **Office**: Noida, UP, India.\nFeel free to write to us anytime! 📞",
+  'email': "You can reach NayePankh Foundation via:\n• 📧 **Email**: support@nayepankh.org\n• 📞 **Phone**: +91-XXXXXXXXXX\n• 📍 **Office**: Noida, UP, India.\nFeel free to write to us anytime! 📞",
+  'phone': "You can reach NayePankh Foundation via:\n• 📧 **Email**: support@nayepankh.org\n• 📞 **Phone**: +91-XXXXXXXXXX\n• 📍 **Office**: Noida, UP, India.\nFeel free to write to us anytime! 📞",
+  'address': "You can reach NayePankh Foundation via:\n• 📧 **Email**: support@nayepankh.org\n• 📞 **Phone**: +91-XXXXXXXXXX\n• 📍 **Office**: Noida, UP, India.\nFeel free to write to us anytime! 📞",
+}
+
 # AI Bot API
-@app.route('/ai-bot')
+@app.route('/ai-bot', methods=['POST'])
 def ai_bot():
-  return jsonify({
-    'message': 'Hello, World!',
-    'status': 200,
-    'data': {
-      'name': 'Naye Pankh Foundation',
-      'year': 2026,
-      'status': 'Online'
-    }
-  }), 200
+  data = request.json or {}
+  content = data.get('content', '')
+  query_lower = content.lower().strip()
+  
+  # Check if there is an exact key match in the query for predefined options
+  for keyword, predefined_reply in PREDEFINED_ANSWERS.items():
+    if keyword in query_lower:
+      return jsonify({
+        'message': predefined_reply,
+        'status': 200
+      }), 200
+      
+  # Dynamic Gemini generation with try-except safety block
+  try:
+    load_env()
+    api_key = os.environ.get('GEMINI_API_KEY')
+    if not api_key:
+      return jsonify({
+        'message': 'AI Assistant Error: GEMINI_API_KEY is not configured in the environment variables.',
+        'status': 500
+      }), 500
+      
+    client = genai.Client(api_key=api_key)
+    response = client.models.generate_content(
+      model="gemini-2.5-flash",
+      contents=f"""
+      You are NayePankh Foundation's elite AI Assistant.
+      
+      About NayePankh Foundation:
+      - We are one of the leading non-governmental organizations working for the upliftment of the underprivileged.
+      - We empower individuals, specifically students and youth, through education, technology, and career skills.
+      - We have successfully mobilized over 5,300+ volunteers.
+      
+      Core Programs:
+      1. Digital Literacy: Building state-of-the-art computer labs and providing digital skills to bridge the digital divide.
+      2. Rural Education: Equipping village primary schools with learning aids, textbooks, and teacher training.
+      3. Skill Development: Conducting vocational training workshops to make youngsters job-ready.
+      4. Healthcare & Environment: Organizing hygiene drives, medical camps, and sustainability tree-planting campaigns.
+      
+      How to Volunteer:
+      - Fill out the "Become a Changemaker" form right next to this chat panel.
+      - Select your preferred interest (Digital Literacy, Rural Education, Skill Development, Healthcare, or Environment).
+      - Our onboarding coordinators review submissions and respond within 24-48 hours.
+      
+      How to Donate:
+      - Click on the "Donate" button located in the top navigation header of the webpage.
+      
+      Contact Options:
+      - Email: support@nayepankh.org
+      - Location: Noida, Uttar Pradesh, India
+      
+      Response Guidelines:
+      - Keep responses concise, warm, helpful, and polite.
+      - Format response using bullet points and emojis where appropriate to maintain a modern, friendly reading experience.
+      - If asked about unrelated topics, politely guide the user back to NayePankh Foundation's mission.
+      
+      User Question: {content}
+      """
+    )
+    
+    return jsonify({
+      'message': response.text,
+      'status': 200,
+    }), 200
+  except Exception as e:
+    # Graceful fallback to rule-based or default helpful offline answer on API errors
+    fallback_reply = None
+    for keyword, predefined_reply in PREDEFINED_ANSWERS.items():
+      if keyword in query_lower:
+        fallback_reply = predefined_reply
+        break
+    if not fallback_reply:
+      fallback_reply = "Thank you for reaching out! NayePankh Foundation is dedicated to bringing positive social change through education, technology, and social welfare. You can join our 5,300+ volunteers by filling out the form on the right, or contact us at support@nayepankh.org. 🌟"
+      
+    return jsonify({
+      'message': fallback_reply,
+      'status': 200,
+      'note': f'Fallback activated due to API error: {str(e)}'
+    }), 200
 
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=PORT, debug=True)

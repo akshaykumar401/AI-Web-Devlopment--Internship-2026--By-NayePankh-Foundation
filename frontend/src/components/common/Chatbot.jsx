@@ -29,6 +29,36 @@ const getAIResponse = (text) => {
   return "That's interesting! NayePankh Foundation is dedicated to bringing positive social change through technology. You can join our 5,300+ volunteers by filling out the form on the right, or ask me something else! 🌟";
 }
 
+const renderFormattedText = (text) => {
+  if (!text) return '';
+  const lines = text.split('\n');
+  return lines.map((line, idx) => {
+    const bulletMatch = line.match(/^(\s*)([•\*\-])\s(.*)/);
+    const processBold = (str) => {
+      const parts = str.split(/\*\*([^*]+)\*\*/g);
+      return parts.map((part, i) => {
+        if (i % 2 === 1) {
+          return <strong key={i} className="font-bold text-gray-900">{part}</strong>;
+        }
+        return part;
+      });
+    };
+    if (bulletMatch) {
+      const content = bulletMatch[3];
+      return (
+        <li key={idx} className="ml-4 list-disc pl-1 my-1 text-gray-700">
+          {processBold(content)}
+        </li>
+      );
+    }
+    return (
+      <p key={idx} className="my-1.5 min-h-[1em]">
+        {processBold(line)}
+      </p>
+    );
+  });
+};
+
 const Chatbot = () => {
   const chatContainerRef = useRef()
   const [msg, setMsg] = useState('')
@@ -44,7 +74,7 @@ const Chatbot = () => {
     }
   }, [messages, isTyping])
 
-  const handleSend = (textToSend) => {
+  const handleSend = async (textToSend) => {
     const trimmed = textToSend.trim()
     if (!trimmed) return
 
@@ -56,12 +86,32 @@ const Chatbot = () => {
     // Trigger AI typing
     setIsTyping(true)
 
-    setTimeout(() => {
+    try {
+      const res = await fetch('http://127.0.0.1:8000/ai-bot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: trimmed
+        }),
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        const aiReply = { from: 'ai', text: data.message }
+        setMessages(prev => [...prev, aiReply])
+      } else {
+        throw new Error('API failed')
+      }
+    } catch (err) {
+      // Fallback to local rule-based response
       const aiReplyText = getAIResponse(trimmed)
       const aiReply = { from: 'ai', text: aiReplyText }
       setMessages(prev => [...prev, aiReply])
+    } finally {
       setIsTyping(false)
-    }, 850)
+    }
   }
 
   const handleKeyPress = (e) => {
@@ -103,7 +153,7 @@ const Chatbot = () => {
               ${m.from === 'user'
                 ? 'bg-orange-500 text-white rounded-tr-sm'
                 : 'bg-white text-gray-800 rounded-tl-sm border border-gray-100'}`}>
-              {m.text}
+              {m.from === 'user' ? m.text : renderFormattedText(m.text)}
             </div>
           </div>
         ))}
