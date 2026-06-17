@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from 'react'
+import MissionCard from '../common/MissionCard'
 
 const CARDS = [
   {
@@ -53,19 +54,15 @@ const Mission = () => {
         {/* Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {CARDS.map((c, i) => (
-            <div
+            <MissionCard
               key={c.title}
-              className={`bg-white rounded-2xl p-7 border border-gray-100
-                          card-hover cursor-default transition-all duration-700
-                          ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-              style={{ transitionDelay: vis ? `${0.15 + i * 0.12}s` : '0s' }}
-            >
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${c.iconBg}`}>
-                {c.icon}
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">{c.title}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">{c.desc}</p>
-            </div>
+              title={c.title}
+              desc={c.desc}
+              iconBg={c.iconBg}
+              icon={c.icon}
+              vis={vis}
+              delay={vis ? `${0.15 + i * 0.12}s` : '0s'}
+            />
           ))}
         </div>
       </div>

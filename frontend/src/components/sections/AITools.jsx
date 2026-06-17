@@ -1,45 +1,12 @@
 import { useRef, useEffect, useState } from 'react'
+import MatchDemo from '../common/MatchDemo'
+import BarChart from '../common/BarChart'
 
 /* ── Small icon components (Remix Icons) ─────────────── */
 const SearchIcon = () => <i className="ri-search-2-line text-xl" />
 const ChartIcon  = () => <i className="ri-bar-chart-2-line text-xl" />
 const ChatIcon   = () => <i className="ri-message-2-line text-xl" />
 const ClockIcon  = () => <i className="ri-time-line text-xl" />
-
-/* ── Match demo widget ───────────────────────────────── */
-const MatchDemo = () => (
-  <div className="mt-4">
-    <div className="flex items-center gap-2 mb-3">
-      <div className="w-11 h-6 rounded-full flex items-center justify-end pr-1"
-           style={{ background: '#E85D04' }}>
-        <div className="w-4 h-4 bg-white rounded-full" />
-      </div>
-      <div className="w-11 h-6 bg-gray-200 rounded-full flex items-center pl-1">
-        <div className="w-4 h-4 bg-white rounded-full" />
-      </div>
-      <span className="text-xs text-gray-400">1 / 124</span>
-    </div>
-    {['Match Score: 94%', 'Location: Bihar', 'Skills: Teaching'].map(t => (
-      <div key={t} className="flex items-center gap-2 bg-orange-50 rounded-lg px-3 py-2 mb-1.5 text-xs text-gray-700">
-        <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
-        {t}
-      </div>
-    ))}
-  </div>
-)
-
-/* ── Bar chart widget ────────────────────────────────── */
-const BarChart = () => (
-  <div className="flex items-end gap-2 h-20 mt-4">
-    {[40, 65, 45, 80, 55, 90, 70].map((h, i) => (
-      <div key={i} className={`flex-1 rounded-t-sm`}
-           style={{
-             height: `${h}%`,
-             background: i === 5 ? '#E85D04' : i === 6 ? 'rgba(232,93,4,0.4)' : 'rgba(255,255,255,0.12)',
-           }} />
-    ))}
-  </div>
-)
 
 const AITools = () => {
   const ref = useRef()
@@ -94,8 +61,7 @@ const AITools = () => {
             <div className={`rounded-2xl p-6 sm:p-7 border ${fadeCard()} delay-100`}
                  style={{ background: '#FFF8F5', borderColor: 'rgba(232,93,4,0.18)' }}>
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-orange-100 text-orange-500
-                                flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-orange-100 text-orange-500 flex items-center justify-center shrink-0">
                   <SearchIcon />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900">Smart Matching</h3>
@@ -110,8 +76,7 @@ const AITools = () => {
             {/* 24/7 Support */}
             <div className={`bg-white rounded-2xl p-6 sm:p-7 border border-gray-100 ${fadeCard()} delay-300`}>
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-gray-100 text-gray-600
-                                flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center shrink-0">
                   <ChatIcon />
                 </div>
                 <h3 className="text-base font-bold text-gray-900">24/7 Smart Support</h3>
@@ -142,10 +107,8 @@ const AITools = () => {
             </div>
 
             {/* Predictive Modeling */}
-            <div className={`bg-white rounded-2xl p-6 sm:p-7 border border-gray-100
-                             flex items-start gap-4 ${fadeCard()} delay-400`}>
-              <div className="w-12 h-12 rounded-xl bg-gray-100 text-gray-600
-                              flex items-center justify-center shrink-0">
+            <div className={`bg-white rounded-2xl p-6 sm:p-7 border border-gray-100 flex items-start gap-4 ${fadeCard()} delay-400`}>
+              <div className="w-12 h-12 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center shrink-0">
                 <ClockIcon />
               </div>
               <div>
