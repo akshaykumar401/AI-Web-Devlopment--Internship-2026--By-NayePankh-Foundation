@@ -24,7 +24,6 @@ The project is structured as a decoupled client-server architecture:
 │   │   ├── Dashboard.html    # Main stats and volunteer management table
 │   │   └── login.html        # Secure admin login form
 │   ├── app.py                # Flask main entrypoint (APIs, auth, DB & Gemini client)
-│   ├── database.db           # SQLite database
 │   ├── requirements.txt      # Python dependencies
 │   ├── .env.sample           # Sample environment configurations
 │   └── .gitignore
@@ -55,7 +54,7 @@ The project is structured as a decoupled client-server architecture:
 ### **Backend**
 - **Framework:** Flask
 - **AI Integration:** Google GenAI SDK (`google-genai` library / Gemini 2.5 Flash)
-- **Database:** SQLite3
+- **Database:** MongoDB (via PyMongo client)
 - **Authentication:** Flask Session-based Auth
 
 ---
@@ -125,9 +124,11 @@ The project is structured as a decoupled client-server architecture:
      ```
    - Open `.env` and fill in your Gemini API Key and admin credentials:
      ```env
-     PORT=8000
-     ADMIN_USERS=admin:admin
-     GEMINI_API_KEY=your-gemini-api-key-here
+      PORT=8000
+      ADMIN_USERS=admin:admin
+      GEMINI_API_KEY=your-gemini-api-key-here
+      MONGO_URI=mongodb://127.0.0.1:27017/
+      MONGO_DB=nayepankh
      ```
 
 5. Run the Flask server:
@@ -160,15 +161,15 @@ The project is structured as a decoupled client-server architecture:
 
 ## 🗄️ Database Schema
 
-The SQLite database (`database.db`) automatically initializes the `volunteers` table with the following schema on startup:
+The MongoDB database automatically initializes the `volunteers` collection with the following document structure on startup:
 
-| Field Name | Type | Key | Default / Extra |
+| Field Name | BSON Type | Index | Description |
 | :--- | :--- | :--- | :--- |
-| `id` | INTEGER | PRIMARY KEY | AUTOINCREMENT |
-| `full_name` | TEXT | - | NOT NULL |
-| `email` | TEXT | - | NOT NULL |
-| `area_of_interest` | TEXT | - | NOT NULL |
-| `created_at` | TIMESTAMP | - | CURRENT_TIMESTAMP |
+| `_id` | ObjectId | Primary Key | Unique document identifier |
+| `full_name` | String | - | Full name of the volunteer |
+| `email` | String | - | Email address of the volunteer |
+| `area_of_interest` | String | - | Selected department / field of interest |
+| `created_at` | Date | Descending | Registration timestamp |
 
 ---
 

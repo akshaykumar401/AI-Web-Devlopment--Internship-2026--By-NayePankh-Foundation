@@ -244,7 +244,7 @@
                   <td class="py-4 px-6 text-gray-500 font-mono text-xs">{{ v.created_at }}</td>
                   <td class="py-4 px-6 text-center">
                     <button
-                      onclick="deleteVolunteer(this, {{ v.id }}, '{{ v.area_of_interest }}')"
+                      onclick="deleteVolunteer(this, '{{ v.id }}', '{{ v.area_of_interest }}')"
                       class="w-8 h-8 rounded-lg bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white flex items-center justify-center mx-auto transition-all cursor-pointer shadow-sm shadow-red-500/5 hover:scale-105"
                       title="Delete registration record"
                     >

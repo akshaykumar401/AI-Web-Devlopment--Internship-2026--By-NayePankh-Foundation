@@ -1,11 +1,12 @@
 import os
-import sqlite3
+import pymongo
+from bson import ObjectId
+import datetime
 from google import genai
 from flask import Flask, request, jsonify, render_template, session, redirect
 
 app = Flask(__name__)
 app.secret_key = 'nayepankh-admin-secret-key-2026'
-DATABASE = os.path.join(os.path.dirname(__file__), 'database.db')
 
 def load_env():
   env_path = os.path.join(os.path.dirname(__file__), '.env')
@@ -20,7 +21,17 @@ def load_env():
 # Load environment variables
 load_env()
 PORT = os.environ.get('PORT', 8000)
+MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/')
+MONGO_DB = os.environ.get('MONGO_DB', 'nayepankh')
 
+# MongoDB Client Instance
+mongo_client = None
+
+def get_db():
+  global mongo_client
+  if not mongo_client:
+    mongo_client = pymongo.MongoClient(MONGO_URI)
+  return mongo_client[MONGO_DB]
 
 # Parse admin users array
 admin_users_str = os.environ.get('ADMIN_USERS', 'admin:admin')
@@ -31,26 +42,17 @@ for user_pair in admin_users_str.split(','):
     ADMIN_USERS_MAP[uname.strip()] = pword.strip()
 
 def init_db():
-  conn = sqlite3.connect(DATABASE)
-  cursor = conn.cursor()
-  cursor.execute('''
-    CREATE TABLE IF NOT EXISTS volunteers (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      full_name TEXT NOT NULL,
-      email TEXT NOT NULL,
-      area_of_interest TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  ''')
-  conn.commit()
-  conn.close()
+  try:
+    db = get_db()
+    # Ping to check connection
+    db.client.admin.command('ping')
+    # Create index on created_at for sorting efficiency
+    db.volunteers.create_index([("created_at", pymongo.DESCENDING)])
+    print("Successfully connected to MongoDB!")
+  except Exception as e:
+    print(f"Error connecting to MongoDB: {str(e)}")
 
-def get_db_connection():
-  conn = sqlite3.connect(DATABASE)
-  conn.row_factory = sqlite3.Row
-  return conn
-
-# Initialize SQLite database table on app start
+# Initialize MongoDB connection on app start
 init_db()
 
 @app.before_request
@@ -94,14 +96,13 @@ def become_volunteer():
     }), 400
 
   try:
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-      'INSERT INTO volunteers (full_name, email, area_of_interest) VALUES (?, ?, ?)',
-      (full_name, email, area_of_interest)
-    )
-    conn.commit()
-    conn.close()
+    db = get_db()
+    db.volunteers.insert_one({
+      'full_name': full_name,
+      'email': email,
+      'area_of_interest': area_of_interest,
+      'created_at': datetime.datetime.now()
+    })
   except Exception as e:
     return jsonify({
       'message': f'Database error: {str(e)}',
@@ -148,17 +149,25 @@ def dashboard():
   if not session.get('logged_in'):
     return redirect('/login')
   try:
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    db = get_db()
     
-    # Get all volunteers
-    volunteers = cursor.execute('SELECT * FROM volunteers ORDER BY created_at DESC').fetchall()
-    
+    # Get all volunteers sorted by created_at DESC
+    cursor = db.volunteers.find().sort('created_at', pymongo.DESCENDING)
+    volunteers = []
+    for doc in cursor:
+      # Map MongoDB _id to standard 'id' for template rendering compatibility
+      doc['id'] = str(doc['_id'])
+      if isinstance(doc.get('created_at'), datetime.datetime):
+        doc['created_at'] = doc['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+      volunteers.append(doc)
+      
     # Get total count
-    total_count = len(volunteers)
+    total_count = db.volunteers.count_documents({})
     
-    # Get stats by area of interest
-    stats_query = cursor.execute('SELECT area_of_interest, COUNT(*) as count FROM volunteers GROUP BY area_of_interest').fetchall()
+    # Get stats by area of interest using MongoDB Aggregation
+    stats_query = db.volunteers.aggregate([
+      {'$group': {'_id': '$area_of_interest', 'count': {'$sum': 1}}}
+    ])
     
     # Default stats dictionary
     stats = {
@@ -168,18 +177,17 @@ def dashboard():
       'Rural Education': 0,
       'Environment': 0
     }
-    for row in stats_query:
-      area = row['area_of_interest']
+    for item in stats_query:
+      area = item['_id']
       if area in stats:
-        stats[area] = row['count']
+        stats[area] = item['count']
         
-    conn.close()
     return render_template('Dashboard.html', volunteers=volunteers, total_count=total_count, stats=stats)
   except Exception as e:
     return f"Database Error: {str(e)}", 500
 
 # Delete Volunteer API
-@app.route('/api/volunteers/<int:volunteer_id>', methods=['DELETE'])
+@app.route('/api/volunteers/<volunteer_id>', methods=['DELETE'])
 def delete_volunteer(volunteer_id):
   if not session.get('logged_in'):
     return jsonify({
@@ -187,15 +195,18 @@ def delete_volunteer(volunteer_id):
       'message': 'Unauthorized: Admin authentication required'
     }), 401
   try:
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('DELETE FROM volunteers WHERE id = ?', (volunteer_id,))
-    conn.commit()
-    conn.close()
-    return jsonify({
-      'status': 'success',
-      'message': 'Volunteer record deleted successfully'
-    }), 200
+    db = get_db()
+    result = db.volunteers.delete_one({'_id': ObjectId(volunteer_id)})
+    if result.deleted_count > 0:
+      return jsonify({
+        'status': 'success',
+        'message': 'Volunteer record deleted successfully'
+      }), 200
+    else:
+      return jsonify({
+        'status': 'error',
+        'message': 'Volunteer record not found'
+      }), 404
   except Exception as e:
     return jsonify({
       'status': 'error',
