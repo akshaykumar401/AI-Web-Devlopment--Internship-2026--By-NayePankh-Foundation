@@ -87,7 +87,7 @@ const Chatbot = () => {
     setIsTyping(true)
 
     try {
-      const res = await fetch('http://127.0.0.1:8000/ai-bot', {
+      const res = await fetch('/api/ai-bot', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
